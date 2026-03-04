@@ -3,7 +3,7 @@
  * Adicional, expone el endpoint para cambiar la contraseña.
  */
 
-package com.lta.bancocanon.ServicioInventario.Controller;
+package com.lta.inventario.ServicioInventario.Controller;
 
 
 import org.springframework.http.ResponseEntity;

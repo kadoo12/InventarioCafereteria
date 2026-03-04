@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario.Controller;
+package com.lta.inventario.ServicioInventario.Controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AutentResponse {
+public class LoginRequest {
 
-    String token;
+String nomUsuario;
+String contrasena;
 }

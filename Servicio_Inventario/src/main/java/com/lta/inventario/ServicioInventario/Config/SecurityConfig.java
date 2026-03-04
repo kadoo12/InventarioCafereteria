@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario.Config;
+package com.lta.inventario.ServicioInventario.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,7 +8,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.lta.bancocanon.ServicioInventario.Jwt.JwtAuthentificationFilter;
+import com.lta.inventario.ServicioInventario.Jwt.JwtAuthentificationFilter;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 

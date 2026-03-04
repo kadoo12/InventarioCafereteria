@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario.Jwt;
+package com.lta.inventario.ServicioInventario.Jwt;
 
 import java.security.Key;
 import java.util.Date;

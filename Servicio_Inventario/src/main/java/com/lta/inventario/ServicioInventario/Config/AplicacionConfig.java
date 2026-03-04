@@ -1,5 +1,5 @@
 
-package com.lta.bancocanon.ServicioInventario.Config;
+package com.lta.inventario.ServicioInventario.Config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 
-import com.lta.bancocanon.ServicioInventario.Usuario.UsuarioRepository;
+import com.lta.inventario.ServicioInventario.Usuario.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 

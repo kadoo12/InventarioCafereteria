@@ -1,12 +1,12 @@
-package com.lta.bancocanon.ServicioInventario.Controller;
+package com.lta.inventario.ServicioInventario.Controller;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import com.lta.bancocanon.ServicioInventario.Jwt.JwtService;
-import com.lta.bancocanon.ServicioInventario.Usuario.UsuarioRepository;
+import com.lta.inventario.ServicioInventario.Jwt.JwtService;
+import com.lta.inventario.ServicioInventario.Usuario.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 

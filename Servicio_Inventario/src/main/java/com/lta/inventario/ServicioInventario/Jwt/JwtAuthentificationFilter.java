@@ -5,7 +5,7 @@
  * 
 */
 
-package com.lta.bancocanon.ServicioInventario.Jwt;
+package com.lta.inventario.ServicioInventario.Jwt;
 
 import java.io.IOException;
 

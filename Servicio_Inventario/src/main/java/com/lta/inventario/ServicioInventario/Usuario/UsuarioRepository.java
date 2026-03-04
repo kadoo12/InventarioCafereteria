@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario.Usuario;
+package com.lta.inventario.ServicioInventario.Usuario;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;

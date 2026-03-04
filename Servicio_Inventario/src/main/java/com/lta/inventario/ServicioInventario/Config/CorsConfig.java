@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario.Config;
+package com.lta.inventario.ServicioInventario.Config;
 
 
 import org.springframework.context.annotation.Bean;

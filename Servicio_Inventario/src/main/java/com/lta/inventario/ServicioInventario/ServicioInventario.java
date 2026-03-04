@@ -1,4 +1,4 @@
-package com.lta.bancocanon.ServicioInventario;
+package com.lta.inventario.ServicioInventario;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
