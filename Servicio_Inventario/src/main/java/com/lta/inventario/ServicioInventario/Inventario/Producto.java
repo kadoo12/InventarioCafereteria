@@ -24,6 +24,7 @@ public class Producto {
 @Column(name = "id_producto")  
 int idProducto;
 
+@Column(nullable = false, unique = true)
 String codigo;
 
 @Column(nullable = false)

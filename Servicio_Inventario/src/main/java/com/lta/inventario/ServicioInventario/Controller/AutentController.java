@@ -10,7 +10,9 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +48,13 @@ public class AutentController {
     public ResponseEntity<List<Producto>> listadoProductos(){
         System.out.println("ENTRANDO A LISTADO PRODUCTOS CONTROLLER");
         return ResponseEntity.ok(inventarioService.obtenerProductos());
+    }
+
+    @PutMapping(value = "/inventario/sumarProducto/{codigo}/{cantidad}")
+    public ResponseEntity<Producto> sumarProducto(
+        @PathVariable String codigo,
+        @PathVariable int cantidad){
+        System.out.println("ENTRANDO A SUMAR PRODUCTO CONTROLLER");
+        return ResponseEntity.ok(inventarioService.sumarAProducto(codigo, cantidad));
     }
 }

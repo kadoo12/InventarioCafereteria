@@ -20,6 +20,15 @@ public class InventarioService {
     public Producto agregaProducto(ProductoRequest productorRequest) {
 
         return productoRepository.findByCodigo(productorRequest.getCodigo())
+                .map((productoExiste) -> {
+                    productoExiste.setCantidad(productoExiste.getCantidad() + productorRequest.getCantidad());
+
+                    if(!productoExiste.getNombreProducto().equalsIgnoreCase(productorRequest.getNombreProducto())){
+                        throw new RuntimeException("El codigo: " + productorRequest.getCodigo() + 
+                        " ya pertenece al producto: " + productoExiste.getNombreProducto());
+                    }
+                    return productoRepository.save(productoExiste);
+                })
                 .orElseGet(() -> {
                     Producto nuevoProducto = Producto.builder()
                             .codigo(productorRequest.getCodigo())
@@ -31,9 +40,9 @@ public class InventarioService {
                 }); 
     }
 
-    public Producto sumarAProducto(String nombreProducto, int cantidadASumar) {
+    public Producto sumarAProducto(String codigoProducto, int cantidadASumar) {
 
-        Producto producto = productoRepository.findByNombreProducto(nombreProducto)
+        Producto producto = productoRepository.findByCodigo(codigoProducto)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         producto.setCantidad(producto.getCantidad() + cantidadASumar);

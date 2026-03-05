@@ -53,13 +53,22 @@ const Inventario = () => {
     p.codigo.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const handleAdd = (data: { codigo: string; nombreProducto: string; precio: number; cantidad: number }) => {
-    const newId = Math.max(...productos.map((p) => p.idProducto), 0) + 1;
-    setProductos([...productos, { idProducto: newId, ...data }]);
+  const handleAdd = (ProductoDesdeServer: Producto) => {
+    setProductos((prev) => {
+      const indiceExiste = prev.findIndex((p) => p.codigo === ProductoDesdeServer.codigo);
+      if (indiceExiste !== -1) {
+        const actualizado = [...prev];
+        actualizado[indiceExiste] = ProductoDesdeServer;
+        return actualizado;
+      }else {
+        return [...prev, ProductoDesdeServer];
+      }        
+    });
+    
   };
 
-  const handleSumar = (id: number, codigo: string, cantidad: number) => {
-    setProductos(productos.map((p) => p.idProducto === id || p.codigo === codigo ? { ...p, cantidad: p.cantidad + cantidad } : p));
+  const handleSumar = (idProducto: number, codigo: string, nuevaCantidadTotal: number) => {
+    setProductos(prevProductos => prevProductos.map((p) => p.idProducto === idProducto || p.codigo === codigo ? { ...p, cantidad: Number(nuevaCantidadTotal) } : p));
   };          
 
   const handleDescontar = (id: number, codigo: string, cantidad: number) => {

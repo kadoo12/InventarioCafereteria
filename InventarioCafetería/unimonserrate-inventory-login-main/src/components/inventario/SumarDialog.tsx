@@ -10,6 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { set } from "date-fns";
+import api from "@/services/api";
 
 interface Producto {
   idProducto: number;
@@ -29,16 +31,26 @@ const SumarDialog = ({ producto, onSumar }: Props) => {
   const [cantidad, setCantidad] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const handleSumar = () => {
-    if (!cantidad || Number(cantidad) <= 0) return;
+  const handleSumar = async () => {
+  if (!cantidad.trim() ||isNaN(Number(cantidad))|| Number(cantidad) <= 0) {
+    alert("Por favor ingresa una cantidad válida (mayor a 0)");
+    return;
+    }
     setShowConfirm(true);
   };
 
-  const confirmar = () => {
-    onSumar(producto.idProducto, producto.codigo, Number(cantidad));
+  const confirmar = async () => {
+    try {
+      const response = await api.put(`/inventario/sumarProducto/${producto.codigo}/${cantidad}`);
+
+    onSumar(producto.idProducto, producto.codigo, response.data.cantidad);
     setCantidad("");
     setShowConfirm(false);
     setOpen(false);
+    } catch (err) {
+      alert("Error al sumar el producto");
+      alert("No se pudo sumar al stock. Por favor, intenta nuevamente.");
+    }
   };
 
   return (
