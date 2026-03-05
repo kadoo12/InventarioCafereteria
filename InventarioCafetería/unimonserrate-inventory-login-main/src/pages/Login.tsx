@@ -25,14 +25,17 @@ const Login = () => {
 
       if (response.status === 200 && response.data.token) {
         console.log("Token received:", response.data.token);
+        
         localStorage.setItem("token", response.data.token);
+
         api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
         const userObject = { nomUsuario };
         localStorage.setItem("user", JSON.stringify(userObject));
         
         console.log("Entrando a inventario con token:", api.defaults.headers.common['Authorization']);
-       navigate("/inventario");
+
+      navigate("/inventario");
       } else {
         setError("Credenciales incorrectas");
       }

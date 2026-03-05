@@ -12,15 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface Producto {
-  id: number;
-  nombre: string;
+  idProducto: number;
+  codigo: string;
+  nombreProducto: string;
   precio: number;
   cantidad: number;
 }
 
 interface Props {
   producto: Producto;
-  onSumar: (id: number, cantidad: number) => void;
+  onSumar: (idProducto: number, codigo: string, cantidad: number) => void;
 }
 
 const SumarDialog = ({ producto, onSumar }: Props) => {
@@ -34,7 +35,7 @@ const SumarDialog = ({ producto, onSumar }: Props) => {
   };
 
   const confirmar = () => {
-    onSumar(producto.id, Number(cantidad));
+    onSumar(producto.idProducto, producto.codigo, Number(cantidad));
     setCantidad("");
     setShowConfirm(false);
     setOpen(false);
@@ -55,11 +56,16 @@ const SumarDialog = ({ producto, onSumar }: Props) => {
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
               <Label>ID del Producto</Label>
-              <Input value={producto.id} disabled />
+              <Input value={producto.idProducto} disabled />
+            </div>
+            <div></div>
+            <div className="space-y-1">
+              <Label>Código del Producto</Label>
+              <Input value={producto.codigo} disabled />
             </div>
             <div className="space-y-1">
               <Label>Producto</Label>
-              <Input value={producto.nombre} disabled />
+              <Input value={producto.nombreProducto} disabled />
             </div>
             <div className="space-y-1">
               <Label>Cantidad a sumar</Label>
@@ -78,7 +84,7 @@ const SumarDialog = ({ producto, onSumar }: Props) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar suma</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Deseas sumar <strong>{cantidad}</strong> unidades a <strong>{producto.nombre}</strong>?
+              ¿Deseas sumar <strong>{cantidad}</strong> unidades a <strong>{producto.nombreProducto}</strong>?
               <br />Stock actual: {producto.cantidad} → Nuevo stock: {producto.cantidad + Number(cantidad || 0)}
             </AlertDialogDescription>
           </AlertDialogHeader>

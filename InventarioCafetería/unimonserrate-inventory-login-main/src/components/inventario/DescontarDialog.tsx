@@ -12,15 +12,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface Producto {
-  id: number;
-  nombre: string;
+  idProducto: number;
+  codigo: string;
+  nombreProducto: string;
   precio: number;
   cantidad: number;
 }
 
 interface Props {
   producto: Producto;
-  onDescontar: (id: number, cantidad: number) => void;
+  onDescontar: (idProducto: number, codigo: string, cantidad: number) => void;
 }
 
 const DescontarDialog = ({ producto, onDescontar }: Props) => {
@@ -39,7 +40,7 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
   };
 
   const confirmar = () => {
-    onDescontar(producto.id, Number(cantidad));
+    onDescontar(producto.idProducto, producto.codigo, Number(cantidad));
     setCantidad("");
     setShowConfirm(false);
     setOpen(false);
@@ -60,11 +61,16 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
               <Label>ID del Producto</Label>
-              <Input value={producto.id} disabled />
+              <Input value={producto.idProducto} disabled />
+            </div>
+            <div></div>
+            <div className="space-y-1">
+              <Label>Código del Producto</Label>
+              <Input value={producto.codigo} disabled />
             </div>
             <div className="space-y-1">
               <Label>Producto</Label>
-              <Input value={producto.nombre} disabled />
+              <Input value={producto.nombreProducto} disabled />
             </div>
             <div className="space-y-1">
               <Label>Stock disponible</Label>
@@ -87,7 +93,7 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar descuento</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Deseas descontar <strong>{cantidad}</strong> unidades de <strong>{producto.nombre}</strong>?
+              ¿Deseas descontar <strong>{cantidad}</strong> unidades de <strong>{producto.nombreProducto}</strong>?
               <br />Stock actual: {producto.cantidad} → Nuevo stock: {producto.cantidad - Number(cantidad || 0)}
             </AlertDialogDescription>
           </AlertDialogHeader>

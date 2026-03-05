@@ -5,14 +5,19 @@
 
 package com.lta.inventario.ServicioInventario.Controller;
 
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lta.inventario.ServicioInventario.Inventario.Producto;
+import com.lta.inventario.ServicioInventario.Inventario.ProductoRequest;
+import com.lta.inventario.ServicioInventario.Inventario.InventarioService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class AutentController {
 
     private final AutentService autentService;
+    private final InventarioService inventarioService;
 
     @PostMapping(value = "/login")
     public ResponseEntity<AutentResponse> login(@RequestBody LoginRequest loginRequest){
@@ -30,5 +36,15 @@ public class AutentController {
         return ResponseEntity.ok(autentService.login(loginRequest));
     }
 
-    
+    @PostMapping(value = "/inventario/agregarProducto")
+    public ResponseEntity<Producto> agregaProducto(@RequestBody ProductoRequest productoRequest){
+        System.out.println("ENTRANDO A AGREGAR PRODUCTO CONTROLLER");
+        return ResponseEntity.ok(inventarioService.agregaProducto(productoRequest));
+    }
+
+    @GetMapping(value = "/inventario/listadoProductos")
+    public ResponseEntity<List<Producto>> listadoProductos(){
+        System.out.println("ENTRANDO A LISTADO PRODUCTOS CONTROLLER");
+        return ResponseEntity.ok(inventarioService.obtenerProductos());
+    }
 }

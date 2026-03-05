@@ -6,26 +6,48 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import api from "@/services/api";
+import { on } from "events";
 interface Props {
-  onAdd: (producto: { nombre: string; precio: number; cantidad: number }) => void;
+  onAdd: (producto: { codigo: string; nombreProducto: string; precio: number; cantidad: number }) => void;
 }
 
 const AddProductDialog = ({ onAdd }: Props) => {
   const [open, setOpen] = useState(false);
-  const [nombre, setNombre] = useState("");
+  const [codigo, setCodigo] = useState("");
+  const [nombreProducto, setNombreProducto] = useState("");
   const [precio, setPrecio] = useState("");
   const [cantidad, setCantidad] = useState("");
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!nombre || !precio || !cantidad) return;
-    onAdd({ nombre, precio: Number(precio), cantidad: Number(cantidad) });
-    setNombre("");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!codigo.trim() || !nombreProducto.trim() || !precio.trim() || !cantidad.trim()) {
+    setError("Todos los campos son obligatorios");
+    return;
+  }
+  try {
+    const nuevoProducto = {
+      codigo,
+      nombreProducto,
+      precio: Number(precio),
+      cantidad: Number(cantidad),
+    };
+
+    const response = await api.post("/inventario/agregarProducto", nuevoProducto);
+
+    onAdd(response.data);
+
+    setOpen(false);
+    setCodigo("");
+    setNombreProducto("");
     setPrecio("");
     setCantidad("");
-    setOpen(false);
-  };
+    setError("");
+  } catch (err) {
+    setError("Error al agregar el producto");
+  }
+};
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -41,8 +63,12 @@ const AddProductDialog = ({ onAdd }: Props) => {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-2">
+            <Label>Código</Label>
+            <Input value={codigo} onChange={(e) => setCodigo(e.target.value)} placeholder="Ej: P001" />
+          </div>
+          <div className="space-y-2">
             <Label>Nombre del producto</Label>
-            <Input value={nombre} onChange={(e) => setNombre(e.target.value)} placeholder="Ej: Resma de papel" />
+            <Input value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)} placeholder="Ej: Manzana" />
           </div>
           <div className="space-y-2">
             <Label>Precio</Label>

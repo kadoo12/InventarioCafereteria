@@ -5,20 +5,21 @@ import AddProductDialog from "@/components/inventario/AddProductDialog";
 import SumarDialog from "@/components/inventario/SumarDialog";
 import DescontarDialog from "@/components/inventario/DescontarDialog";
 import DeleteProductDialog from "@/components/inventario/DeleteProductDialog";
-
+import api from "@/services/api";
 interface Producto {
-  id: number;
-  nombre: string;
+  idProducto: number;
+  codigo: string;
+  nombreProducto: string;
   precio: number;
   cantidad: number;
 }
 
-const initialProducts: Producto[] = [];
+
 
 const Inventario = () => {
   const navigate = useNavigate();
   const [nomUsuario, setUser] = useState<{ nomUsuario: string } | null>(null);
-  const [productos, setProductos] = useState<Producto[]>(initialProducts);
+  const [productos, setProductos] = useState<Producto[]>([]);
   const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
@@ -28,6 +29,17 @@ const Inventario = () => {
       return;
     }
     setUser(JSON.parse(stored));
+
+    const cargarProductos = async () => {
+      try {
+        const response = await api.get("/inventario/listadoProductos");
+        setProductos(response.data);
+    }catch (err) {
+        console.error("Error al cargar productos:", err);
+      }
+    };
+
+    cargarProductos();
   }, [navigate]);
 
   const handleLogout = () => {
@@ -36,25 +48,26 @@ const Inventario = () => {
   };
 
   const filteredProducts = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.id.toString().includes(busqueda)
+    p.nombreProducto.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.idProducto.toString().includes(busqueda) ||
+    p.codigo.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const handleAdd = (data: { nombre: string; precio: number; cantidad: number }) => {
-    const newId = Math.max(...productos.map((p) => p.id), 0) + 1;
-    setProductos([...productos, { id: newId, ...data }]);
+  const handleAdd = (data: { codigo: string; nombreProducto: string; precio: number; cantidad: number }) => {
+    const newId = Math.max(...productos.map((p) => p.idProducto), 0) + 1;
+    setProductos([...productos, { idProducto: newId, ...data }]);
   };
 
-  const handleSumar = (id: number, cantidad: number) => {
-    setProductos(productos.map((p) => p.id === id ? { ...p, cantidad: p.cantidad + cantidad } : p));
-  };
+  const handleSumar = (id: number, codigo: string, cantidad: number) => {
+    setProductos(productos.map((p) => p.idProducto === id || p.codigo === codigo ? { ...p, cantidad: p.cantidad + cantidad } : p));
+  };          
 
-  const handleDescontar = (id: number, cantidad: number) => {
-    setProductos(productos.map((p) => p.id === id ? { ...p, cantidad: p.cantidad - cantidad } : p));
+  const handleDescontar = (id: number, codigo: string, cantidad: number) => {
+    setProductos(productos.map((p) => p.idProducto === id || p.codigo === codigo ? { ...p, cantidad: p.cantidad - cantidad } : p));
   };
 
   const handleDelete = (id: number) => {
-    setProductos(productos.filter((p) => p.id !== id));
+    setProductos(productos.filter((p) => p.idProducto !== id));
   };
 
   const formatCurrency = (val: number) =>
@@ -136,6 +149,7 @@ const Inventario = () => {
                 <tr className="bg-primary">
                   <th className="text-left py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">ID</th>
                   <th className="text-left py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">Nombre Producto</th>
+                  <th className="text-left py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">Código</th>
                   <th className="text-left py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">Precio</th>
                   <th className="text-left py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">Cantidad</th>
                   <th className="text-right py-3.5 px-5 text-xs font-heading font-semibold text-primary-foreground uppercase tracking-wider">Acciones</th>
@@ -143,12 +157,13 @@ const Inventario = () => {
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredProducts.map((p) => (
-                  <tr key={p.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="py-3.5 px-5 text-sm text-muted-foreground font-mono">{p.id}</td>
+                  <tr key={p.idProducto} className="hover:bg-muted/50 transition-colors">
+                    <td className="py-3.5 px-5 text-sm text-muted-foreground font-mono">{p.idProducto}</td>
                     <td className="py-3.5 px-5 text-sm font-medium text-foreground flex items-center gap-2">
                       <Package className="h-4 w-4 text-secondary" />
-                      {p.nombre}
+                      {p.nombreProducto}
                     </td>
+                    <td className="py-3.5 px-5 text-sm text-foreground">{p.codigo}</td>
                     <td className="py-3.5 px-5 text-sm text-foreground">{formatCurrency(p.precio)}</td>
                     <td className="py-3.5 px-5">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${p.cantidad < 20 ? 'bg-destructive/10 text-destructive' : p.cantidad < 100 ? 'bg-accent/20 text-accent-foreground' : 'bg-secondary/10 text-secondary'}`}>
@@ -159,7 +174,7 @@ const Inventario = () => {
                       <div className="flex items-center justify-end gap-1">
                         <SumarDialog producto={p} onSumar={handleSumar} />
                         <DescontarDialog producto={p} onDescontar={handleDescontar} />
-                        <DeleteProductDialog productoNombre={p.nombre} onDelete={() => handleDelete(p.id)} />
+                        <DeleteProductDialog productoNombre={p.nombreProducto} onDelete={() => handleDelete(p.idProducto)} />
                       </div>
                     </td>
                   </tr>
