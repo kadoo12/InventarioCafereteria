@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 
 @Service
 @AllArgsConstructor
@@ -17,6 +18,7 @@ public class InventarioService {
         return productoRepository.findAll();
     }
     
+    @SuppressWarnings("null")
     public Producto agregaProducto(ProductoRequest productorRequest) {
 
         return productoRepository.findByCodigo(productorRequest.getCodigo())
@@ -30,7 +32,7 @@ public class InventarioService {
                     return productoRepository.save(productoExiste);
                 })
                 .orElseGet(() -> {
-                    Producto nuevoProducto = Producto.builder()
+                    @NonNull Producto nuevoProducto = Producto.builder()
                             .codigo(productorRequest.getCodigo())
                             .nombreProducto(productorRequest.getNombreProducto())
                             .precio(productorRequest.getPrecio())

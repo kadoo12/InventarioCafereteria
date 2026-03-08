@@ -42,7 +42,12 @@ const errores = {
 setCamposVacios(errores);
 
   if (Object.values(errores).some((v) => v)) {
-    setError("Todos los campos son obligatorios");
+    alert("Todos los campos son obligatorios");
+    
+  if (Object.values(cantidad).some((v) => v)) {
+    alert("La cantidad debe ser un número mayor a 0");
+  }
+
     return;
   }
   
@@ -97,9 +102,9 @@ const inputClass = (hasError: boolean) =>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-heading">Nuevo Producto</DialogTitle>
+          <label className="space-y-2">Campos Obligatorios (<span className="text-destructive">*</span>)</label>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          
           <div className="space-y-2">
             <Label>Código <span className="text-destructive">*</span></Label>
             <Input 
@@ -110,7 +115,7 @@ const inputClass = (hasError: boolean) =>
             }} placeholder="Ej: P001" />
           </div>
           <div className="space-y-2">
-            <Label>Nombre del producto</Label>
+            <Label>Nombre del producto <span className="text-destructive">*</span></Label>
             <Input 
             className={inputClass(camposVacios.nombreProducto)}
             value={nombreProducto} 
