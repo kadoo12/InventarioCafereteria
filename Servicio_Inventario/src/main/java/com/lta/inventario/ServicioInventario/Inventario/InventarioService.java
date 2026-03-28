@@ -19,7 +19,7 @@ public class InventarioService {
     }
     
     @SuppressWarnings("null")
-    public Producto agregaProducto(ProductoRequest productorRequest) {
+    public Producto agregaProducto(@NonNull ProductoRequest productorRequest) {
 
         return productoRepository.findByCodigo(productorRequest.getCodigo())
                 .map((productoExiste) -> {
@@ -32,7 +32,7 @@ public class InventarioService {
                     return productoRepository.save(productoExiste);
                 })
                 .orElseGet(() -> {
-                    @NonNull Producto nuevoProducto = Producto.builder()
+                    Producto nuevoProducto = Producto.builder()
                             .codigo(productorRequest.getCodigo())
                             .nombreProducto(productorRequest.getNombreProducto())
                             .precio(productorRequest.getPrecio())
@@ -50,5 +50,28 @@ public class InventarioService {
         producto.setCantidad(producto.getCantidad() + cantidadASumar);
         return productoRepository.save(producto);
     }
-    
+
+    public Producto descontarCantidad(String codigoProducto, int cantidadADescontar) {
+        Producto producto = productoRepository.findByCodigo(codigoProducto)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (cantidadADescontar < 0) {
+            throw new RuntimeException("La cantidad a descontar no puede ser menor que cero");
+        }
+        if (producto.getCantidad() < cantidadADescontar) {
+            throw new RuntimeException("Cantidad insuficiente en stock");
+        }
+
+        producto.setCantidad(producto.getCantidad() - cantidadADescontar);
+        return productoRepository.save(producto);
+    }
+
+    public void eliminarProducto(String codigoProducto) {
+        Producto producto = productoRepository.findByCodigo(codigoProducto)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (producto != null) {
+            productoRepository.delete(producto);
+        }
+    }
 }

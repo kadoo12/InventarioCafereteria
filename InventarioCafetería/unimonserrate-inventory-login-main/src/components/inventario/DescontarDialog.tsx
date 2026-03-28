@@ -10,7 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
+import api from "@/services/api";
+import { set } from "date-fns";
 interface Producto {
   idProducto: number;
   codigo: string;
@@ -29,9 +30,11 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
   const [cantidad, setCantidad] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleDescontar = () => {
-    if (!cantidad || Number(cantidad) <= 0) return;
+    if (!cantidad.trim() || Number(cantidad) <= 0) return;
+
     if (Number(cantidad) > producto.cantidad) {
       setShowError(true);
       return;
@@ -39,11 +42,24 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
     setShowConfirm(true);
   };
 
-  const confirmar = () => {
-    onDescontar(producto.idProducto, producto.codigo, Number(cantidad));
-    setCantidad("");
-    setShowConfirm(false);
-    setOpen(false);
+  const confirmar = async () => {
+
+    try{
+      setLoading(true);
+
+      const response = await api.put(`/inventario/descontarCantidad/${producto.codigo}/${cantidad}`);
+      
+      onDescontar(producto.idProducto, producto.codigo, response.data.cantidad);
+      setCantidad("");
+      setShowConfirm(false);
+      setOpen(false);
+    }catch(err){
+      console.error("Error al descontar el producto:", err);
+      alert("Error al descontar el producto. Por favor, intenta nuevamente.");
+      setShowConfirm(false);
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (

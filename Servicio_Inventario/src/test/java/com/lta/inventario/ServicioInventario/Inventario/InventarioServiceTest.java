@@ -47,13 +47,10 @@ class InventarioServiceTest {
         assertEquals("P001", resultado.getCodigo());
         assertEquals("CHOCOLATE", resultado.getNombreProducto());
 
+}
 
-
-
-    }
-    
-    @Test
-    void debeObtenerProductos() {
+@Test
+void debeObtenerProductos() {
         Producto producto =  Producto.builder()
                 .codigo("P001")
                 .nombreProducto("CHOCOLATE")
@@ -67,15 +64,15 @@ class InventarioServiceTest {
 
         assertEquals(1, resultado.size());
         assertEquals("P001", resultado.get(0).getCodigo());
-    }   
+}   
 
-    @SuppressWarnings("null")
-    @Test
-    void deberiaSumarCantidadSiProductoExiste() {
+@SuppressWarnings("null")
+@Test
+void deberiaSumarCantidadSiProductoExiste() {
 
-    ProductoRequest request = new ProductoRequest("P002","Cafe",2000,5);
+ProductoRequest request = new ProductoRequest("P002","Cafe",2000,5);
 
-    Producto productoExistente = Producto.builder()
+Producto productoExistente = Producto.builder()
             .codigo("P002")
             .nombreProducto("Cafe")
             .precio(2000)

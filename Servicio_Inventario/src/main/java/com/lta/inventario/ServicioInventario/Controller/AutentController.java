@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,5 +57,22 @@ public class AutentController {
         @PathVariable int cantidad){
         System.out.println("ENTRANDO A SUMAR PRODUCTO CONTROLLER");
         return ResponseEntity.ok(inventarioService.sumarAProducto(codigo, cantidad));
+
     }
+    @PutMapping(value = "/inventario/descontarCantidad/{codigo}/{cantidad}")
+    public ResponseEntity<Producto> descontarCantidad(
+        @PathVariable String codigo,
+        @PathVariable int cantidad){
+        System.out.println("ENTRANDO A DESCONTAR PRODUCTO CONTROLLER");
+        return ResponseEntity.ok(inventarioService.descontarCantidad(codigo, cantidad));
+
+    }
+    @DeleteMapping(value = "/inventario/eliminarProducto/{codigo}")
+    public ResponseEntity<Void> eliminarProducto(
+        @PathVariable String codigo){
+        System.out.println("ENTRANDO A ELIMINAR PRODUCTO CONTROLLER");
+        inventarioService.eliminarProducto(codigo);
+        return ResponseEntity.noContent().build();
+    }
+
 }

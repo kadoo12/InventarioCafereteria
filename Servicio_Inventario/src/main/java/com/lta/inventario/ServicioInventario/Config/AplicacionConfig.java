@@ -42,6 +42,7 @@ public class AplicacionConfig {
     @Bean
     public PasswordEncoder contraseñaEncoder() {
         System.out.println("ENTRANDO A CONTRASEÑA ENCODER");
+        //generarContraseña();
         return new BCryptPasswordEncoder();
     }
 
@@ -52,4 +53,9 @@ public class AplicacionConfig {
             .orElseThrow(()-> new UsernameNotFoundException("Usuario no encontrado"));
     }
 
+    public void generarContraseña(){
+        String contraseña = "xxxx";
+        String contraseñaEncriptada = new BCryptPasswordEncoder().encode(contraseña);
+        System.out.println("Contraseña encriptada: " + contraseñaEncriptada);
+    }
 }

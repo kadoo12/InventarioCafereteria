@@ -41,7 +41,8 @@ public class JwtService {
     private Key getKey() {
         System.out.println("OBTENIENDO CONTRASEÑA");
        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
-       return Keys.hmacShaKeyFor(keyBytes); 
+       return Keys.hmacShaKeyFor(keyBytes);
+
     }
 
     public String extractUsername(String token) {

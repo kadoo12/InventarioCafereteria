@@ -14,8 +14,6 @@ interface Producto {
   cantidad: number;
 }
 
-
-
 const Inventario = () => {
   const navigate = useNavigate();
   const [nomUsuario, setUser] = useState<{ nomUsuario: string } | null>(null);
@@ -68,15 +66,27 @@ const Inventario = () => {
   };
 
   const handleSumar = (idProducto: number, codigo: string, nuevaCantidadTotal: number) => {
-    setProductos(prevProductos => prevProductos.map((p) => p.idProducto === idProducto || p.codigo === codigo ? { ...p, cantidad: Number(nuevaCantidadTotal) } : p));
+    setProductos(prevProductos => 
+      prevProductos.map((p) => p.idProducto === idProducto || p.codigo === codigo 
+      ? { ...p, cantidad: Number(nuevaCantidadTotal) } : p));
   };          
 
   const handleDescontar = (id: number, codigo: string, cantidad: number) => {
-    setProductos(productos.map((p) => p.idProducto === id || p.codigo === codigo ? { ...p, cantidad: p.cantidad - cantidad } : p));
+    setProductos(prevProductos => 
+      prevProductos.map((p) => 
+        p.idProducto === id || p.codigo === codigo 
+    ? { ...p, cantidad: Number(cantidad) } : p));
   };
 
-  const handleDelete = (id: number) => {
-    setProductos(productos.filter((p) => p.idProducto !== id));
+  const handleDelete = async (codigo: string, id: number) => {
+    try{
+      await api.delete(`/inventario/eliminarProducto/${codigo}`);
+      
+      setProductos(prev => prev.filter(p => p.idProducto !== id));
+    }catch (err) {
+      alert("Error al eliminar producto:" + err);
+    }
+    
   };
 
   const formatCurrency = (val: number) =>
@@ -183,7 +193,7 @@ const Inventario = () => {
                       <div className="flex items-center justify-end gap-1">
                         <SumarDialog producto={p} onSumar={handleSumar} />
                         <DescontarDialog producto={p} onDescontar={handleDescontar} />
-                        <DeleteProductDialog productoNombre={p.nombreProducto} onDelete={() => handleDelete(p.idProducto)} />
+                        <DeleteProductDialog productoNombre={p.nombreProducto} onDelete={() => handleDelete(p.codigo, p.idProducto)} />
                       </div>
                     </td>
                   </tr>
