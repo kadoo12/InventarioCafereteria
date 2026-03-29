@@ -32,7 +32,7 @@ class UsuarioTest {
         MockitoAnnotations.openMocks(this);
         autentService = new AutentService(usuarioRepository, jwtService, authenticationManager);
     }
-
+    //LOGIN DEBE RETORNAR TOKEN
     @Test
     void loginMustReturnToken() {
         LoginRequest loginRequest = new LoginRequest();
