@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { LogOut, Package, Search } from "lucide-react";
 import AddProductDialog from "@/components/inventario/AddProductDialog";
 import SumarDialog from "@/components/inventario/SumarDialog";
@@ -23,7 +23,7 @@ const Inventario = () => {
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (!stored) {
-      navigate("/");
+      navigate("/", { replace: true });
       return;
     }
     setUser(JSON.parse(stored));
@@ -42,7 +42,7 @@ const Inventario = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    navigate("/");
+    navigate("/", { replace: true});
   };
 
   const filteredProducts = productos.filter((p) =>
@@ -157,7 +157,7 @@ const Inventario = () => {
               className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-input bg-card text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-ring transition-all"
             />
           </div>
-          <AddProductDialog onAdd={handleAdd} />
+          <AddProductDialog onAdd={handleAdd} productos={productos}/>
         </div>
 
         {/* Table */}

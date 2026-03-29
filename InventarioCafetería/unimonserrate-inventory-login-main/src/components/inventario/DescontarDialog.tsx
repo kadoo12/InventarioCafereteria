@@ -33,10 +33,13 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const handleDescontar = () => {
-    if (!cantidad.trim() || Number(cantidad) <= 0) return;
+    if (!cantidad.trim() || Number(cantidad) <= 0) {
+      alert("Por favor ingresa una cantidad válida a descontar (mayor a 0)");
+      return;
+    }
 
     if (Number(cantidad) > producto.cantidad) {
-      setShowError(true);
+      alert("No puedes descontar más de lo que hay en stock");
       return;
     }
     setShowConfirm(true);
@@ -54,8 +57,7 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
       setShowConfirm(false);
       setOpen(false);
     }catch(err){
-      console.error("Error al descontar el producto:", err);
-      alert("Error al descontar el producto. Por favor, intenta nuevamente.");
+      alert("Error al descontar el producto. Por favor, intenta nuevamente."+err);
       setShowConfirm(false);
     }finally{
       setLoading(false);
@@ -73,6 +75,9 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="font-heading">Descontar Stock</DialogTitle>
+             <label className="space-y-2">
+            Campos Obligatorios (<span className="text-destructive">*</span>)
+          </label>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
@@ -93,8 +98,13 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
               <Input value={producto.cantidad} disabled />
             </div>
             <div className="space-y-1">
-              <Label>Cantidad a descontar</Label>
-              <Input type="number" min="1" value={cantidad} onChange={(e) => setCantidad(e.target.value)} placeholder="Ej: 5" />
+              <Label>Cantidad a descontar <span className="text-destructive">*</span></Label>
+              <Input type="number" 
+              min="1" 
+              value={cantidad} 
+              onChange={(e) => 
+                setCantidad(e.target.value)} 
+              placeholder="Ej: 5" />
             </div>
             <div className="flex gap-3 justify-end pt-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
@@ -120,19 +130,6 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={showError} onOpenChange={setShowError}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Error</AlertDialogTitle>
-            <AlertDialogDescription>
-              No se puede descontar más del disponible. Stock actual: <strong>{producto.cantidad}</strong> unidades.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowError(false)}>Entendido</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { replace, useNavigate } from "react-router-dom";
 import { User, Lock, LogIn } from "lucide-react";
 import api from "@/services/api";
 
@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!nomUsuario.trim() || !contrasena.trim()) {
-      setError("Por favor completa todos los campos");
+      alert("Por favor completa todos los campos");
       return;
     }
     try {
@@ -35,15 +35,15 @@ const Login = () => {
         
         console.log("Entrando a inventario con token:", api.defaults.headers.common['Authorization']);
 
-      navigate("/inventario");
+      navigate("/inventario", { replace: true });
       } else {
-        setError("Credenciales incorrectas");
+        alert("Credenciales incorrectas");
       }
     } catch (err: any) {
       if(err.response && err.response.status === 401) {
-        setError("Credenciales incorrectas");
+        alert("Credenciales incorrectas");
       } else {
-        setError("Error al iniciar sesión");
+        alert("Credenciales incorrectas. Vuelva a Intentarlo.");
       }
     }
   };
