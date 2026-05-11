@@ -21,7 +21,7 @@ SELECT * FROM dbo.producto
 
 SELECT nombre_producto, cantidad
 FROM dbo.producto
-WHERE nombre_producto = 'mandarina'
+WHERE nombre_producto = 'Manzana'
 
 --VALIDAR EXISTENCIA POR CONTRASEÑA--
 SELECT nom_usuario

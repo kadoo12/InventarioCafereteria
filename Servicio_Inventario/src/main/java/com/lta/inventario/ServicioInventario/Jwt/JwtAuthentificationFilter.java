@@ -9,6 +9,8 @@ package com.lta.inventario.ServicioInventario.Jwt;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +28,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthentificationFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthentificationFilter.class);
 
     private final JwtService jwtService;
 
@@ -46,35 +51,35 @@ public FilterRegistrationBean<JwtAuthentificationFilter> jwtFilterRegistration(J
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-System.out.println("ENTRANDO A JWT AUTHENTICATION FILTER");
-
-// Ejecuta esto en un Main o un Test para obtener el valor
-//System.out.println(new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode("contrasena123"));
-
+        
         final String token = getTokenFromRequest(request);
         final String nomUsuario;
 
         if (token == null) {
             filterChain.doFilter(request, response);
-            System.out.println("NO SE ENCONTRÓ TOKEN, CONTINUANDO CON EL FILTRO");
             return;
         }
-        System.out.println("TOKEN ENCONTRADO: "+token);
-        nomUsuario = jwtService.extractUsername(token);
-System.out.println("USUARIO EXTRAIDO DEL TOKEN: "+nomUsuario);
-        if (nomUsuario != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(nomUsuario);
-System.out.println("USUARIO DETALLADO: "+userDetails.getUsername());
-            if (jwtService.isTokenValid(token, userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, 
-                    null, 
-                    userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                System.out.println("USUARIO AUTENTICADO, CONFIGURANDO SECURITY CONTEXT");
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        
+        try {
+            nomUsuario = jwtService.extractUsername(token);
+            
+            if (nomUsuario != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(nomUsuario);
+                
+                if (jwtService.isTokenValid(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, 
+                        null, 
+                        userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                    logger.debug("Usuario {} autenticado por JWT", nomUsuario);
+                }
             }
+        } catch (Exception e) {
+            logger.debug("Error al validar JWT: {}", e.getMessage());
         }
+        
         filterChain.doFilter(request, response);
     }
 

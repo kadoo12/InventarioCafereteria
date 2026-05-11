@@ -1,0 +1,10 @@
+.env.local
+node_modules
+npm-debug.log
+yarn-error.log
+.git
+.gitignore
+dist
+build
+coverage
+.nyc_output

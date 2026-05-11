@@ -8,6 +8,7 @@ package com.lta.inventario.ServicioInventario.Controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lta.inventario.ServicioInventario.Inventario.Producto;
@@ -27,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/controller")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:8080/")
+@CrossOrigin(origins = {"http://localhost:3000"})
 public class AutentController {
 
     private final AutentService autentService;
@@ -73,6 +75,14 @@ public class AutentController {
         System.out.println("ENTRANDO A ELIMINAR PRODUCTO CONTROLLER");
         inventarioService.eliminarProducto(codigo);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/generarHash")
+    public ResponseEntity<String> generarHash(@RequestParam String password){
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hash = encoder.encode(password);
+        System.out.println("Hash generado: " + hash);
+        return ResponseEntity.ok(hash);
     }
 
 }

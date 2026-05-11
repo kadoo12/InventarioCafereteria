@@ -1,5 +1,7 @@
 package com.lta.inventario.ServicioInventario.Controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,26 +16,37 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AutentService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AutentService.class);
+
     private final UsuarioRepository usuarioRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
 
     public AutentResponse login(LoginRequest loginRequest) {
-        System.out.println("ENTRANDO A LOGIN");
-    authenticationManager.authenticate(
-    new UsernamePasswordAuthenticationToken(loginRequest.getNomUsuario(), 
-                                            loginRequest.getContrasena()));
-    System.out.println("USUARIO AUTENTICADO");
-
-    UserDetails usuario = usuarioRepository.findByNomUsuario(loginRequest.getNomUsuario()).orElseThrow();
-    System.out.println("USUARIO ENCONTRADO: "+usuario.getUsername());
-    
-    String token = jwtService.getToken(usuario);    
-    return AutentResponse.builder()
-            .token(token)
-            .build();    
-    
+        logger.info("Intento de login para usuario: {}", loginRequest.getNomUsuario());
+        
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    loginRequest.getNomUsuario(), 
+                    loginRequest.getContrasena()
+                )
+            );
+            logger.info("Autenticación exitosa para: {}", loginRequest.getNomUsuario());
+        } catch (Exception e) {
+            logger.warn("Fallo en autenticación para usuario: {}", loginRequest.getNomUsuario());
+            throw e;
         }
+
+        UserDetails usuario = usuarioRepository.findByNomUsuario(loginRequest.getNomUsuario()).orElseThrow();
+        
+        String token = jwtService.getToken(usuario);
+        logger.info("Token generado para usuario: {}", usuario.getUsername());
+        
+        return AutentResponse.builder()
+                .token(token)
+                .build();    
+    }
 
 }
