@@ -4,11 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.lta.inventario.ServicioInventario.Jwt.JwtService;
 import com.lta.inventario.ServicioInventario.Usuario.UsuarioRepository;
+import com.lta.inventario.ServicioInventario.Usuario.Usuario;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,13 +40,15 @@ public class AutentService {
             throw e;
         }
 
-        UserDetails usuario = usuarioRepository.findByNomUsuario(loginRequest.getNomUsuario()).orElseThrow();
+        Usuario usuario = (Usuario) usuarioRepository.findByNomUsuario(loginRequest.getNomUsuario()).orElseThrow();
         
         String token = jwtService.getToken(usuario);
         logger.info("Token generado para usuario: {}", usuario.getUsername());
         
         return AutentResponse.builder()
                 .token(token)
+                .rol(usuario.getRol())
+                .nomUsuario(usuario.getNomUsuario())
                 .build();    
     }
 

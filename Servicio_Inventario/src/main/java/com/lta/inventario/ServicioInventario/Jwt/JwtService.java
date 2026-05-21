@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.lta.inventario.ServicioInventario.Usuario.Usuario;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -26,7 +27,14 @@ public class JwtService {
 
     public String getToken(UserDetails usuario) {
         logger.debug("Generando JWT para usuario: {}", usuario.getUsername());
-        return getToken(new HashMap<>(), usuario);   
+        Map<String, Object> extraClaims = new HashMap<>();
+        
+        if (usuario instanceof Usuario) {
+            Usuario usuarioEntity = (Usuario) usuario;
+            extraClaims.put("rol", usuarioEntity.getRol());
+        }
+        
+        return getToken(extraClaims, usuario);   
     }
 
     private String getToken(Map<String, Object> extraClaims, UserDetails usuario){
@@ -50,6 +58,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return getClaims(token,Claims::getSubject);
+    }
+
+    public String extractRol(String token) {
+        return getClaims(token, claims -> claims.get("rol", String.class));
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

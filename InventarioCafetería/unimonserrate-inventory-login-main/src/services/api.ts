@@ -7,9 +7,15 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-
 });
+
+// Interceptor para agregar el token a todas las peticiones
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export default api;
-
-
-//const response = await api.post("/controller/login", { nomUsuario, contrasena });

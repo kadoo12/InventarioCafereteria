@@ -8,6 +8,7 @@ package com.lta.inventario.ServicioInventario.Controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,42 +38,48 @@ public class AutentController {
 
     @PostMapping(value = "/login")
     public ResponseEntity<AutentResponse> login(@RequestBody LoginRequest loginRequest){
-        System.out.println("ENTRANDO A LOGIN CONTROLLER");
         return ResponseEntity.ok(autentService.login(loginRequest));
     }
 
     @PostMapping(value = "/inventario/agregarProducto")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> agregaProducto(@RequestBody ProductoRequest productoRequest){
-        System.out.println("ENTRANDO A AGREGAR PRODUCTO CONTROLLER");
+        System.out.println("ProductoRequest recibido: " + productoRequest);
         return ResponseEntity.ok(inventarioService.agregaProducto(productoRequest));
     }
 
     @GetMapping(value = "/inventario/listadoProductos")
     public ResponseEntity<List<Producto>> listadoProductos(){
-        System.out.println("ENTRANDO A LISTADO PRODUCTOS CONTROLLER");
         return ResponseEntity.ok(inventarioService.obtenerProductos());
     }
 
+    @GetMapping(value = "/inventario/listadoProductos/categoria/{categoriaId}")
+    public ResponseEntity<List<Producto>> listadoProductosPorCategoria(@PathVariable Integer categoriaId){
+        return ResponseEntity.ok(inventarioService.obtenerProductosPorCategoria(categoriaId));
+    }
+
     @PutMapping(value = "/inventario/sumarProducto/{codigo}/{cantidad}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Producto> sumarProducto(
         @PathVariable String codigo,
         @PathVariable int cantidad){
-        System.out.println("ENTRANDO A SUMAR PRODUCTO CONTROLLER");
         return ResponseEntity.ok(inventarioService.sumarAProducto(codigo, cantidad));
 
     }
+    
     @PutMapping(value = "/inventario/descontarCantidad/{codigo}/{cantidad}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'VENDEDOR')")
     public ResponseEntity<Producto> descontarCantidad(
         @PathVariable String codigo,
         @PathVariable int cantidad){
-        System.out.println("ENTRANDO A DESCONTAR PRODUCTO CONTROLLER");
         return ResponseEntity.ok(inventarioService.descontarCantidad(codigo, cantidad));
 
     }
+    
     @DeleteMapping(value = "/inventario/eliminarProducto/{codigo}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminarProducto(
         @PathVariable String codigo){
-        System.out.println("ENTRANDO A ELIMINAR PRODUCTO CONTROLLER");
         inventarioService.eliminarProducto(codigo);
         return ResponseEntity.noContent().build();
     }
@@ -81,7 +88,6 @@ public class AutentController {
     public ResponseEntity<String> generarHash(@RequestParam String password){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode(password);
-        System.out.println("Hash generado: " + hash);
         return ResponseEntity.ok(hash);
     }
 

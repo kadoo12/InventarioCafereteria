@@ -20,32 +20,23 @@ services:
       retries: 10
 
   backend:
-  build:
-    context: ./Servicio_Inventario
-  container_name: inventario-backend
-  environment:
-    DB_HOST: postgres
-    DB_PORT: 5432
-    DB_NAME: inventario
-    DB_USER: postgres
-    DB_PASSWORD: password
-    SPRING_JPA_HIBERNATE_DDL_AUTO: update
-  ports:
-    - "8081:8081"
-  volumes:
-    - ./Servicio_Inventario/src:/app/src
-    - ./Servicio_Inventario/pom.xml:/app/pom.xml
-  depends_on:
-    postgres:
-      condition: service_healthy
-  networks:
-    - inventario-network
-  develop:
-    watch:
-      - action: sync
-        path: ./Servicio_Inventario/src
-        target: /app/src
-
+    build:
+      context: ./Servicio_Inventario
+    container_name: inventario-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: inventario
+      DB_USER: postgres
+      DB_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - inventario-network
 
   frontend:
     image: inventario-frontend

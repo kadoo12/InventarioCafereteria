@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import api from "@/services/api";
-import { set } from "date-fns";
+
 interface Producto {
   idProducto: number;
   codigo: string;
@@ -23,13 +23,13 @@ interface Producto {
 interface Props {
   producto: Producto;
   onDescontar: (idProducto: number, codigo: string, cantidad: number) => void;
+  onUnauthorized?: () => void;
 }
 
-const DescontarDialog = ({ producto, onDescontar }: Props) => {
+const DescontarDialog = ({ producto, onDescontar, onUnauthorized }: Props) => {
   const [open, setOpen] = useState(false);
   const [cantidad, setCantidad] = useState("");
   const [showConfirm, setShowConfirm] = useState(false);
-  const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleDescontar = () => {
@@ -46,8 +46,7 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
   };
 
   const confirmar = async () => {
-
-    try{
+    try {
       setLoading(true);
 
       const response = await api.put(`/inventario/descontarCantidad/${producto.codigo}/${cantidad}`);
@@ -56,10 +55,15 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
       setCantidad("");
       setShowConfirm(false);
       setOpen(false);
-    }catch(err){
-      alert("Error al descontar el producto. Por favor, intenta nuevamente."+err);
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        onUnauthorized?.();
+        setOpen(false);
+      } else {
+        alert("Error al descontar el producto. Por favor, intenta nuevamente.");
+      }
       setShowConfirm(false);
-    }finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -75,16 +79,15 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="font-heading">Descontar Stock</DialogTitle>
-             <label className="space-y-2">
-            Campos Obligatorios (<span className="text-destructive">*</span>)
-          </label>
+            <label className="space-y-2">
+              Campos Obligatorios (<span className="text-destructive">*</span>)
+            </label>
           </DialogHeader>
           <div className="space-y-4 mt-2">
             <div className="space-y-1">
               <Label>ID del Producto</Label>
               <Input value={producto.idProducto} disabled />
             </div>
-            <div></div>
             <div className="space-y-1">
               <Label>Código del Producto</Label>
               <Input value={producto.codigo} disabled />
@@ -99,12 +102,13 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
             </div>
             <div className="space-y-1">
               <Label>Cantidad a descontar <span className="text-destructive">*</span></Label>
-              <Input type="number" 
-              min="1" 
-              value={cantidad} 
-              onChange={(e) => 
-                setCantidad(e.target.value)} 
-              placeholder="Ej: 5" />
+              <Input 
+                type="number" 
+                min="1" 
+                value={cantidad} 
+                onChange={(e) => setCantidad(e.target.value)} 
+                placeholder="Ej: 5" 
+              />
             </div>
             <div className="flex gap-3 justify-end pt-2">
               <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
@@ -125,11 +129,12 @@ const DescontarDialog = ({ producto, onDescontar }: Props) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmar}>Confirmar</AlertDialogAction>
+            <AlertDialogAction onClick={confirmar} disabled={loading}>
+              {loading ? "Procesando..." : "Confirmar"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
     </>
   );
 };

@@ -48,7 +48,7 @@ class AutentControllerTest {
     void deberiaHacerLogin() {
         LoginRequest request = new LoginRequest("omar", "123");
 
-        AutentResponse responseMock = new AutentResponse("token123");
+        AutentResponse responseMock = new AutentResponse("token123", "ADMIN", "omar");
 
         when(autentService.login(request)).thenReturn(responseMock);
 
@@ -62,7 +62,7 @@ class AutentControllerTest {
     @SuppressWarnings("null")
     @Test
     void deberiaAgregarProducto() {
-        ProductoRequest request = new ProductoRequest("P001", "Cafe", 2000, 10);
+        ProductoRequest request = new ProductoRequest("P001", "Cafe", 2000, 10, null);
 
         when(inventarioService.agregaProducto(request)).thenReturn(producto);
 

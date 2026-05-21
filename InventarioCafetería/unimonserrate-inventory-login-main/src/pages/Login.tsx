@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { replace, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { User, Lock, LogIn } from "lucide-react";
 import api from "@/services/api";
 
@@ -19,31 +19,32 @@ const Login = () => {
     try {
       const response = await api.post("/login", { 
         nomUsuario: nomUsuario, 
-        contrasena: contrasena });
-
-        console.log("Login response:", response);
+        contrasena: contrasena 
+      });
 
       if (response.status === 200 && response.data.token) {
-        console.log("Token received:", response.data.token);
-        
+        // Guardar token
         localStorage.setItem("token", response.data.token);
-
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-
-        const userObject = { nomUsuario };
+        
+        // Guardar rol
+        localStorage.setItem("rol", response.data.rol);
+        
+        // Guardar usuario
+        const userObject = { nomUsuario: response.data.nomUsuario };
         localStorage.setItem("user", JSON.stringify(userObject));
         
-        console.log("Entrando a inventario con token:", api.defaults.headers.common['Authorization']);
+        // Configurar header de Authorization
+        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
 
-      navigate("/inventario", { replace: true });
+        navigate("/inventario", { replace: true });
       } else {
         alert("Credenciales incorrectas");
       }
     } catch (err: any) {
       if(err.response && err.response.status === 401) {
-        alert("Credenciales incorrectas");
+        setError("Credenciales incorrectas");
       } else {
-        alert("Credenciales incorrectas. Vuelva a Intentarlo.");
+        setError("Error en el servidor. Intenta más tarde.");
       }
     }
   };
@@ -76,7 +77,6 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div>
-               {/* Se usa htmlFor para conectar con el id del input */}
               <label 
               htmlFor="nomUsuario"
               className="block text-sm font-medium text-muted-foreground mb-1.5">

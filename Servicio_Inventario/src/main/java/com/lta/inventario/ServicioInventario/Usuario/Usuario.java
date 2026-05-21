@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue   ;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -18,12 +18,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data       //Agrega los getters y setters automaticamente
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity     //Para el uso del JPA
-@Table (name = "Usuario", uniqueConstraints = {@UniqueConstraint(columnNames = {"nom_usuario"})})
+@Entity
+@Table(name = "Usuario", uniqueConstraints = {@UniqueConstraint(columnNames = {"nom_usuario"})})
 public class Usuario implements UserDetails {
     
     @Id    
@@ -36,21 +36,21 @@ public class Usuario implements UserDetails {
 
     String contrasena;
 
+    @Column(nullable = false)
+    String rol;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + rol));
     } 
-    
-    
     
     @Override
     public String getPassword() {
-    return contrasena; 
-}
+        return contrasena; 
+    }
+    
     @Override
     public String getUsername() {
         return nomUsuario;
     }
-
 }

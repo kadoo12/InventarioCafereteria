@@ -3,6 +3,7 @@ package com.lta.inventario.ServicioInventario.Inventario;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,12 +18,12 @@ class InventarioServiceTest {
     @Mock
     private InventarioRepository inventarioRepository;
 
+    @InjectMocks
     private InventarioService inventarioService;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        inventarioService = new InventarioService(inventarioRepository);
     }
 
     //OBTENER PRODUCTOS
@@ -44,9 +45,9 @@ class InventarioServiceTest {
 
     //AGREGAR NUEVO PRODUCTO
     @SuppressWarnings("null")
-@Test
+    @Test
     void deberiaAgregarProductoNuevo() {
-        ProductoRequest request = new ProductoRequest("P001", "CHOCOLATE", 1000, 10);
+        ProductoRequest request = new ProductoRequest("P001", "CHOCOLATE", 1000, 10, null);
 
         when(inventarioRepository.findByCodigo("P001")).thenReturn(Optional.empty());
         when(inventarioRepository.save(any())).thenAnswer(i -> i.getArgument(0));
@@ -58,7 +59,7 @@ class InventarioServiceTest {
 
     //PRODUCTO EXISTENTE → SUMA CANTIDAD
     @SuppressWarnings("null")
-@Test
+    @Test
     void deberiaSumarCantidadSiProductoExiste() {
         Producto existente = Producto.builder()
                 .codigo("P002")
@@ -67,7 +68,7 @@ class InventarioServiceTest {
                 .cantidad(10)
                 .build();
 
-        ProductoRequest request = new ProductoRequest("P002", "Cafe", 2000, 5);
+        ProductoRequest request = new ProductoRequest("P002", "Cafe", 2000, 5, null);
 
         when(inventarioRepository.findByCodigo("P002")).thenReturn(Optional.of(existente));
         when(inventarioRepository.save(any())).thenReturn(existente);
@@ -86,7 +87,7 @@ class InventarioServiceTest {
                 .cantidad(10)
                 .build();
 
-        ProductoRequest request = new ProductoRequest("P002", "Te", 2000, 5);
+        ProductoRequest request = new ProductoRequest("P002", "Te", 2000, 5, null);
 
         when(inventarioRepository.findByCodigo("P002")).thenReturn(Optional.of(existente));
 
@@ -107,7 +108,7 @@ class InventarioServiceTest {
 
     //SUMAR CANTIDAD CORRECTO
     @SuppressWarnings("null")
-@Test
+    @Test
     void deberiaSumarCantidadAProducto() {
         Producto producto = Producto.builder()
                 .codigo("P003")
@@ -154,7 +155,7 @@ class InventarioServiceTest {
 
     //DESCONTAR CORRECTAMENTE
     @SuppressWarnings("null")
-@Test
+    @Test
     void deberiaDescontarCantidadCorrectamente() {
         Producto producto = Producto.builder()
                 .codigo("P006")

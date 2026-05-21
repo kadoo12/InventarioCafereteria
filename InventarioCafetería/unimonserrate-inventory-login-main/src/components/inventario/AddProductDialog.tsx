@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
@@ -8,18 +8,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import api from "@/services/api";
 
+interface Categoria {
+  id: number;
+  nombre: string;
+  descripcion: string;
+}
+
 interface Props {
   onAdd: (producto: { codigo: string; nombreProducto: string; precio: number; cantidad: number }) => void;
   productos: { codigo: string }[];
+  onUnauthorized?: () => void;
 }
 
-const AddProductDialog = ({ onAdd, productos }: Props) => {
+const AddProductDialog = ({ onAdd, productos, onUnauthorized }: Props) => {
 
   const [open, setOpen] = useState(false);
   const [codigo, setCodigo] = useState("");
   const [nombreProducto, setNombreProducto] = useState("");
   const [precio, setPrecio] = useState("");
   const [cantidad, setCantidad] = useState("");
+  const [categoriaId, setCategoriaId] = useState<string>("");
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [error, setError] = useState("");
 
   const [camposVacios, setCamposVacios] = useState({
@@ -27,7 +36,23 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
     nombreProducto: false,
     precio: false,
     cantidad: false,
+    categoriaId: false,
   });
+
+  // Cargar categorías cuando se abre el diálogo
+  useEffect(() => {
+    if (open) {
+      const cargarCategorias = async () => {
+        try {
+          const response = await api.get("/categorias");
+          setCategorias(response.data);
+        } catch (err) {
+          console.error("Error al cargar categorías:", err);
+        }
+      };
+      cargarCategorias();
+    }
+  }, [open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,38 +62,40 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
       (p) => p.codigo.toLowerCase() === codigo.toLowerCase()
     );
 
-    //VALIDAR CÓDIGO DUPLICADO
+    // VALIDAR CÓDIGO DUPLICADO
     if (existeCodigo) {
       setCamposVacios({
         codigo: true,
         nombreProducto: false,
         precio: false,
         cantidad: false,
+        categoriaId: false,
       });
       alert("El código del producto ya existe");
       return;
     }
 
-    //VALIDAR CAMPOS VACÍOS
-    if (!codigo.trim() || !nombreProducto.trim() || !precio.trim() || !cantidad.trim()) {
+    // VALIDAR CAMPOS VACÍOS (INCLUYENDO CATEGORÍA)
+    if (!codigo.trim() || !nombreProducto.trim() || !precio.trim() || !cantidad.trim() || !categoriaId.trim()) {
       setCamposVacios({
         codigo: !codigo.trim(),
         nombreProducto: !nombreProducto.trim(),
         precio: !precio.trim(),
         cantidad: !cantidad.trim(),
+        categoriaId: !categoriaId.trim(),
       });
-      alert("Todos los campos son obligatorios");
+      alert("Todos los campos son obligatorios. Por favor selecciona una categoría.");
       return;
     }
 
-    //VALIDAR PRECIO
+    // VALIDAR PRECIO
     if (isNaN(Number(precio)) || Number(precio) <= 0) {
       setCamposVacios(prev => ({ ...prev, precio: true }));
       alert("El precio debe ser un número mayor a 0");
       return;
     }
 
-    //VALIDAR CANTIDAD
+    // VALIDAR CANTIDAD
     if (isNaN(Number(cantidad)) || Number(cantidad) <= 0) {
       setCamposVacios(prev => ({ ...prev, cantidad: true }));
       alert("La cantidad debe ser un número mayor a 0");
@@ -81,6 +108,7 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
         nombreProducto,
         precio: Number(precio),
         cantidad: Number(cantidad),
+        categoriaId: Number(categoriaId),
       };
 
       const response = await api.post("/inventario/agregarProducto", nuevoProducto);
@@ -91,14 +119,19 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
       resetForm();
 
     } catch (err: any) {
-      const mensajeError = err.response?.data?.message || "Error al agregar el producto";
-      setError(mensajeError);
+      if (err.response?.status === 403) {
+        onUnauthorized?.();
+        setOpen(false);
+      } else {
+        const mensajeError = err.response?.data?.message || "Error al agregar el producto";
+        setError(mensajeError);
 
-      setCamposVacios(prev => ({
-        ...prev,
-        codigo: true,
-        nombreProducto: true,
-      }));
+        setCamposVacios(prev => ({
+          ...prev,
+          codigo: true,
+          nombreProducto: true,
+        }));
+      }
     }
   };
 
@@ -107,17 +140,22 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
     setNombreProducto("");
     setPrecio("");
     setCantidad("");
+    setCategoriaId("");
     setError("");
     setCamposVacios({
       codigo: false,
       nombreProducto: false,
       precio: false,
       cantidad: false,
+      categoriaId: false,
     });
   };
 
   const inputClass = (hasError: boolean) =>
     `transition-all ${hasError ? "border-destructive focus-visible:ring-destructive" : ""}`;
+
+  const selectClass = (hasError: boolean) =>
+    `w-full px-3 py-2 rounded-lg border transition-all ${hasError ? "border-destructive focus-visible:ring-destructive" : "border-input"} bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring`;
 
   return (
     <Dialog open={open} onOpenChange={(val) => { setOpen(val); if (!val) resetForm(); }}>
@@ -165,6 +203,29 @@ const AddProductDialog = ({ onAdd, productos }: Props) => {
               }}
               placeholder="Ej: Manzana"
             />
+          </div>
+
+          {/* CATEGORÍA - AHORA OBLIGATORIA */}
+          <div className="space-y-2">
+            <Label>Categoría <span className="text-destructive">*</span></Label>
+            <select
+              value={categoriaId}
+              onChange={(e) => {
+                setCategoriaId(e.target.value);
+                setCamposVacios({ ...camposVacios, categoriaId: false });
+              }}
+              className={selectClass(camposVacios.categoriaId)}
+            >
+              <option value="">-- Selecciona una categoría --</option>
+              {categorias.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nombre}
+                </option>
+              ))}
+            </select>
+            {camposVacios.categoriaId && (
+              <p className="text-sm text-destructive">La categoría es obligatoria</p>
+            )}
           </div>
 
           {/* PRECIO */}
