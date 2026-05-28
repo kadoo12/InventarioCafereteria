@@ -152,7 +152,7 @@ const Inventario = () => {
             </div>
             <div>
               <h1 className="text-lg font-heading font-bold text-primary-foreground">Inventario</h1>
-              <p className="text-xs text-primary-foreground/50">Unimonserrate</p>
+              <p className="text-xs text-primary-foreground/50">Minimarket SAS</p>
             </div>
           </div>
           <div className="flex items-center gap-4">

@@ -64,7 +64,7 @@ const Login = () => {
             <span className="text-3xl font-heading font-extrabold text-secondary-foreground">U</span>
           </div>
           <h1 className="text-3xl font-heading font-bold text-primary-foreground">
-            Unimonserrate
+            Minimarket SAS
           </h1>
           <p className="text-primary-foreground/60 mt-1 text-sm">Sistema de Inventario</p>
         </div>
@@ -133,7 +133,7 @@ const Login = () => {
         </div>
 
         <p className="text-center text-primary-foreground/40 text-xs mt-6">
-          © 2026 Fundación Universitaria Monserrate
+          © 2026 Minimarket SAS
         </p>
       </div>
     </div>
